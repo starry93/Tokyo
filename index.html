@@ -22,7 +22,6 @@ th{background:#f7f8f9;padding:11px 9px;font-size:12px;color:#555;border-bottom:1
 td{padding:8px 9px;border-bottom:1px solid #eef0f2;vertical-align:middle;font-size:14px;line-height:1.5}
 tr:last-child td{border-bottom:0}
 .check{width:45px;text-align:center;vertical-align:middle} .time{width:120px}
-.memo-head,.memo-cell{width:220px}
 
 /* 체크박스 스타일 수정 (기본 체크박스 완전히 숨김) */
 .check label{display:inline-block;position:relative;width:21px;height:21px;cursor:pointer;vertical-align:middle;}
@@ -37,12 +36,10 @@ tr.done .editable{color:#a3a7ad;text-decoration:line-through}
 .editable:focus{outline:2px solid #dfe2e6;border-color:#aaa;background:#fff}
 .time-edit{font-weight:700;white-space:nowrap;resize:none;overflow:hidden}
 .content-edit{min-height:58px}
-.memo{border:1px solid #d9dce1;background:#fff;font-size:12px;min-height:48px}
-.memo:focus{border-color:#aaa}
 .guide-note{font-size:11px;color:#858b94;margin:4px 7px 0}
-button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555;font-size:12px;cursor:pointer}
-.actions{display:flex;justify-content:center;gap:8px;margin-top:18px}
-.action{border:0;border-radius:11px;padding:11px 15px;background:#111827;color:#fff;font-weight:700;cursor:pointer;transition:all 0.2s}
+button{border:0;border-radius:99px;padding:7px 10px;background:#f0f1f3;color:#555;font-size:12px;cursor:pointer}
+.actions{display:flex;justify-content:center;gap:8px;margin-top:18px;flex-wrap:wrap;}
+.action{border:0;border-radius:11px;padding:10px 14px;background:#111827;color:#fff;font-weight:700;cursor:pointer;transition:all 0.2s}
 .action.secondary{background:#fff;color:#333;border:1px solid #ddd;font-weight:normal}
 .hint{font-size:12px;color:#7b818a;text-align:center;margin:10px 0 0}
 
@@ -58,6 +55,7 @@ button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555
 @media(max-width:600px){
 .wrap{padding:16px 9px 35px} .hero{padding:22px 18px} h1{font-size:23px}
 .day-card{padding:14px} .date{font-size:19px} table{min-width:100%}
+.action{padding:8px 10px;font-size:13px;}
 }
 </style>
 </head>
@@ -69,17 +67,21 @@ button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555
 <div class="summary">
 <span class="pill" id="total">전체 0 / 0</span>
 <span class="pill" id="percent">진행률 0%</span>
-<span class="pill">✓ 일정·시간·비고 자동 저장</span>
+<span class="pill">✓ 일정·시간 자동 저장</span>
 </div>
 </header>
 
 <div class="actions" style="margin-top:0;margin-bottom:16px">
-<button id="btn-schedule" class="action" onclick="showPage('schedule')">📅 여행 일정</button>
-<button id="btn-packing" class="action secondary" onclick="showPage('packing')">🎒 여행 준비</button>
-<button id="btn-places" class="action secondary" onclick="showPage('places')">🍚 쇼핑·맛집·카페</button>
+<button id="btn-day1" class="action nav-btn" onclick="showPage('day1')">📅 11/21(토)</button>
+<button id="btn-day2" class="action secondary nav-btn" onclick="showPage('day2')">📅 11/22(일)</button>
+<button id="btn-day3" class="action secondary nav-btn" onclick="showPage('day3')">📅 11/23(월)</button>
+<button id="btn-day4" class="action secondary nav-btn" onclick="showPage('day4')">📅 11/24(화)</button>
+<button id="btn-packing" class="action secondary nav-btn" onclick="showPage('packing')">🎒 여행 준비</button>
+<button id="btn-places" class="action secondary nav-btn" onclick="showPage('places')">🍚 쇼핑·맛집·카페</button>
 </div>
 
-<div id="schedulePage">
+<!-- 11/21(토) 페이지 -->
+<div id="day1Page" class="page-content">
 <section class="day-card" data-day="11/21(토)">
 <div class="day-header">
   <div><div class="date">11/21(토)</div><div class="progress-text">0 / 10 완료</div></div>
@@ -87,61 +89,54 @@ button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555
 </div>
 <div class="progress"><div class="bar"></div></div>
 <div class="table-wrap"><table class="styled-table">
-<thead><tr><th class="check">✓</th><th class="time">시간</th><th>내용</th><th class="memo-head">비고</th></tr></thead>
+<thead><tr><th class="check">✓</th><th class="time">시간</th><th>내용</th></tr></thead>
 <tbody><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-0"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-0-time">06:30-09:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-0-content">마산역 - 광명역 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-0-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-1"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-1-time">09:30-10:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-1-content">광명역 - 김포공항 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-1-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-2"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-2-time">10:30-11:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-2-content">카운터 체크인 &amp; 보안 검사</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-2-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-3"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-3-time">11:30-12:20</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-3-content">비행기 탑승</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-3-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-4"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-4-time">12:20-14:25</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-4-content">김포 - 하네다 공항 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-4-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-5"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-5-time">14:25-15:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-5-content">입국심사</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-5-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-6"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-6-time">15:00-16:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-6-content">하네다 - 도쿄 시내 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-6-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-7"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-7-time">16:00-17:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-7-content">숙소 체크인</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-7-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-8"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-8-time">17:00-17:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-8-content">롯폰기 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-8-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/21(토)-9"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/21(토)-9-time">17:30-</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/21(토)-9-content">저녁 식사 및 롯폰기 일루미네이션 관광(도쿄타워)</textarea><div class="guide-note">※ 시간되면 오모테산도까지 관광</div></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/21(토)-9-memo" placeholder="비고 입력"></textarea></td>
 </tr></tbody>
 </table></div>
 </section>
+</div>
 
+<!-- 11/22(일) 페이지 -->
+<div id="day2Page" class="page-content" style="display:none">
 <section class="day-card" data-day="11/22(일)">
 <div class="day-header">
   <div><div class="date">11/22(일)</div><div class="progress-text">0 / 3 완료</div></div>
@@ -149,12 +144,11 @@ button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555
 </div>
 <div class="progress"><div class="bar"></div></div>
 <div class="table-wrap"><table class="styled-table">
-<thead><tr><th class="check">✓</th><th class="time">시간</th><th>내용</th><th class="memo-head">비고</th></tr></thead>
+<thead><tr><th class="check">✓</th><th class="time">시간</th><th>내용</th></tr></thead>
 <tbody><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/22(일)-0"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/22(일)-0-time">06:00-08:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/22(일)-0-content">준비</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/22(일)-0-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/22(일)-1"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/22(일)-1-time">08:00-18:30</textarea></td>
@@ -165,16 +159,17 @@ button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555
 - 사다리마을
 - 오이시 공원
 - 단풍 회랑</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/22(일)-1-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/22(일)-2"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/22(일)-2-time">18:30-</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/22(일)-2-content">저녁 식사 및 휴식</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/22(일)-2-memo" placeholder="비고 입력"></textarea></td>
 </tr></tbody>
 </table></div>
 </section>
+</div>
 
+<!-- 11/23(월) 페이지 -->
+<div id="day3Page" class="page-content" style="display:none">
 <section class="day-card" data-day="11/23(월)">
 <div class="day-header">
   <div><div class="date">11/23(월)</div><div class="progress-text">0 / 5 완료</div></div>
@@ -182,36 +177,34 @@ button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555
 </div>
 <div class="progress"><div class="bar"></div></div>
 <div class="table-wrap"><table class="styled-table">
-<thead><tr><th class="check">✓</th><th class="time">시간</th><th>내용</th><th class="memo-head">비고</th></tr></thead>
+<thead><tr><th class="check">✓</th><th class="time">시간</th><th>내용</th></tr></thead>
 <tbody><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/23(월)-0"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/23(월)-0-time">08:00-10:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/23(월)-0-content">준비</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/23(월)-0-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/23(월)-1"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/23(월)-1-time">10:00-11:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/23(월)-1-content">숙소 - 아사쿠사 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/23(월)-1-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/23(월)-2"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/23(월)-2-time">11:00-16:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/23(월)-2-content">아사쿠사(카미나리몬-나카미세도리-센소지) - 갓파바시 도구거리</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/23(월)-2-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/23(월)-3"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/23(월)-3-time">16:00-17:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/23(월)-3-content">아사쿠사 - 긴자 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/23(월)-3-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/23(월)-4"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/23(월)-4-time">17:00-</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/23(월)-4-content">저녁 식사 및 돈키호테 쇼핑</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/23(월)-4-memo" placeholder="비고 입력"></textarea></td>
 </tr></tbody>
 </table></div>
 </section>
+</div>
 
+<!-- 11/24(화) 페이지 -->
+<div id="day4Page" class="page-content" style="display:none">
 <section class="day-card" data-day="11/24(화)">
 <div class="day-header">
   <div><div class="date">11/24(화)</div><div class="progress-text">0 / 9 완료</div></div>
@@ -219,58 +212,50 @@ button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555
 </div>
 <div class="progress"><div class="bar"></div></div>
 <div class="table-wrap"><table class="styled-table">
-<thead><tr><th class="check">✓</th><th class="time">시간</th><th>내용</th><th class="memo-head">비고</th></tr></thead>
+<thead><tr><th class="check">✓</th><th class="time">시간</th><th>내용</th></tr></thead>
 <tbody><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-0"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-0-time">07:00-09:00</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-0-content">준비</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-0-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-1"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-1-time">09:00-09:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-1-content">코인 락커 캐리어 보관</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-1-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-2"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-2-time">09:30-12:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-2-content">아침 식사 및 긴자 쇼핑</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-2-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-3"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-3-time">12:30-13:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-3-content">긴자 - 하네다 공항 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-3-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-4"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-4-time">13:30-14:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-4-content">카운터 체크인 &amp; 보안 검사</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-4-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-5"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-5-time">14:30-15:30</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-5-content">면세점 쇼핑</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-5-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-6"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-6-time">15:30-15:55</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-6-content">비행기 탑승</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-6-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-7"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-7-time">15:55-18:35</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-7-content">하네다 - 김포 공항 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-7-memo" placeholder="비고 입력"></textarea></td>
 </tr><tr>
 <td class="check"><label><input type="checkbox" class="task" data-key="11/24(화)-8"><span class="box"></span></label></td>
 <td class="time"><textarea class="editable time-edit" data-key="11/24(화)-8-time">18:35-19:35</textarea></td>
 <td class="content"><textarea class="editable content-edit" data-key="11/24(화)-8-content">공항 - 집 이동</textarea></td>
-<td class="memo-cell"><textarea class="editable memo" data-key="11/24(화)-8-memo" placeholder="비고 입력"></textarea></td>
 </tr></tbody>
 </table></div>
 </section>
 </div>
 
-<div id="packingPage" style="display:none">
+<!-- 여행 준비 페이지 -->
+<div id="packingPage" class="page-content" style="display:none">
 <section class="day-card">
 <h2>🎒 여행 준비</h2>
 
@@ -311,7 +296,8 @@ button{border:0;border-radius:9px;padding:7px 10px;background:#f0f1f3;color:#555
 </table>
 </section></div>
 
-<div id="placesPage" style="display:none">
+<!-- 쇼핑, 맛집, 카페 페이지 -->
+<div id="placesPage" class="page-content" style="display:none">
 <section class="day-card">
 <div class="category-header">
   <h2>🛍 쇼핑</h2>
@@ -390,11 +376,10 @@ edits.forEach(x=>x.addEventListener('input',save));
 document.querySelectorAll('.reset-day').forEach(btn=>btn.addEventListener('click',()=>{
  const card=btn.closest('.day-card');
  card.querySelectorAll('.task').forEach(x=>x.checked=false);
- card.querySelectorAll('.memo').forEach(x=>x.value='');
  save();
 }));
 function checkAll(){tasks.forEach(x=>x.checked=true);save();}
-function clearAll(){tasks.forEach(x=>x.checked=false);edits.filter(x=>x.classList.contains('memo')).forEach(x=>x.value='');save();}
+function clearAll(){tasks.forEach(x=>x.checked=false);save();}
 
 document.querySelectorAll('.add-row').forEach(btn=>{
  btn.addEventListener('click',()=>{
@@ -405,8 +390,7 @@ document.querySelectorAll('.add-row').forEach(btn=>{
    tr.innerHTML=`
    <td class="check"><label><input type="checkbox" class="task"><span class="box"></span></label></td>
    <td class="time"><textarea class="editable time-edit"></textarea></td>
-   <td class="content"><textarea class="editable content-edit"></textarea></td>
-   <td class="memo-cell"><textarea class="editable memo" placeholder="비고 입력"></textarea></td>`;
+   <td class="content"><textarea class="editable content-edit"></textarea></td>`;
 
    tbody.appendChild(tr);
 
@@ -418,14 +402,14 @@ document.querySelectorAll('.add-row').forEach(btn=>{
 });
 
 function showPage(p){
-  document.getElementById('schedulePage').style.display=p==='schedule'?'block':'none';
-  document.getElementById('packingPage').style.display=p==='packing'?'block':'none';
-  document.getElementById('placesPage').style.display=p==='places'?'block':'none';
-
-  // 탭 버튼 선택 효과
-  document.getElementById('btn-schedule').className = p==='schedule' ? 'action' : 'action secondary';
-  document.getElementById('btn-packing').className = p==='packing' ? 'action' : 'action secondary';
-  document.getElementById('btn-places').className = p==='places' ? 'action' : 'action secondary';
+  const pages = ['day1', 'day2', 'day3', 'day4', 'packing', 'places'];
+  pages.forEach(page => {
+    const el = document.getElementById(page + 'Page');
+    if(el) el.style.display = (p === page) ? 'block' : 'none';
+    
+    const btn = document.getElementById('btn-' + page);
+    if(btn) btn.className = (p === page) ? 'action nav-btn' : 'action secondary nav-btn';
+  });
 }
 
 function addSimpleRow(id){
