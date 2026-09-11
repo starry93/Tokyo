@@ -337,9 +337,6 @@ button{border:0;border-radius:99px;padding:7px 10px;background:#f0f1f3;color:#55
 </div>
 
 <script>
-const tasks=[...document.querySelectorAll('.task')];
-const edits=[...document.querySelectorAll('.editable')];
-
 // 텍스트 영역 자동 높이 조절 기능
 function autoResizeTextarea(textarea) {
   textarea.style.height = 'auto';
@@ -353,76 +350,123 @@ function adjustAllTextareas() {
 }
 
 function save(){
- localStorage.setItem('tokyo-checks',JSON.stringify(tasks.map(x=>x.checked)));
- const values={};
- edits.forEach(x=>values[x.dataset.key]=x.value);
- localStorage.setItem('tokyo-edits',JSON.stringify(values));
- update();
+  // 1. 일정 체크박스 및 텍스트 저장
+  const tasks = [...document.querySelectorAll('.task')];
+  const edits = [...document.querySelectorAll('.editable')];
+  localStorage.setItem('tokyo-checks', JSON.stringify(tasks.map(x => x.checked)));
+  const values = {};
+  edits.forEach(x => values[x.dataset.key] = x.value);
+  localStorage.setItem('tokyo-edits', JSON.stringify(values));
+
+  // 2. 여행 준비 & 장소(쇼핑/맛집/카페) 테이블 동적 구조 및 데이터 저장
+  const extraTables = ['toiletry', 'cosmetic', 'clothes', 'etc', 'shop', 'food', 'cafe'];
+  const extraData = {};
+
+  extraTables.forEach(id => {
+    const table = document.getElementById(id);
+    if (!table) return;
+    const rows = [...table.querySelectorAll('tbody tr')];
+    extraData[id] = rows.map(tr => {
+      const inputs = [...tr.querySelectorAll('input[type="text"]')].map(i => i.value);
+      const checked = tr.querySelector('input[type="checkbox"]')?.checked || false;
+      return { inputs, checked };
+    });
+  });
+
+  localStorage.setItem('tokyo-extra-data', JSON.stringify(extraData));
+  update();
 }
+
 function load(){
  try{
-  const checks=JSON.parse(localStorage.getItem('tokyo-checks')||'[]');
-  const values=JSON.parse(localStorage.getItem('tokyo-edits')||'{}');
-  tasks.forEach((x,i)=>x.checked=!!checks[i]);
-  edits.forEach(x=>{if(Object.prototype.hasOwnProperty.call(values,x.dataset.key))x.value=values[x.dataset.key];});
+  // 1. 일정 로드
+  const tasks = [...document.querySelectorAll('.task')];
+  const edits = [...document.querySelectorAll('.editable')];
+  const checks = JSON.parse(localStorage.getItem('tokyo-checks')||'[]');
+  const values = JSON.parse(localStorage.getItem('tokyo-edits')||'{}');
+  tasks.forEach((x,i) => x.checked = !!checks[i]);
+  edits.forEach(x => { if(Object.prototype.hasOwnProperty.call(values, x.dataset.key)) x.value = values[x.dataset.key]; });
+
+  // 2. 여행 준비 & 장소 테이블 로드
+  const extraData = JSON.parse(localStorage.getItem('tokyo-extra-data') || '{}');
+  Object.keys(extraData).forEach(id => {
+    const table = document.getElementById(id);
+    if (!table) return;
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = ''; // 기존 기본행 삭제 후 저장된 구조 재구성
+
+    extraData[id].forEach(item => {
+      const r = tbody.insertRow();
+      if (['toiletry', 'cosmetic', 'clothes', 'etc'].includes(id)) {
+        r.innerHTML = `<td><input type="text" value="${item.inputs[0] || ''}"></td><td class="check"><label><input type="checkbox" ${item.checked ? 'checked' : ''}><span class="box"></span></label></td>`;
+      } else {
+        r.innerHTML = `<td><input type="text" placeholder="위치" value="${item.inputs[0] || ''}"></td><td><input type="text" placeholder="가게명" value="${item.inputs[1] || ''}"></td><td><input type="text" placeholder="내용" value="${item.inputs[2] || ''}"></td><td class="check"><label><input type="checkbox" ${item.checked ? 'checked' : ''}><span class="box"></span></label></td>`;
+      }
+    });
+  });
  }catch(e){}
+
+ bindEvents();
  update();
  adjustAllTextareas();
 }
-function update(){
- let done=0;
- document.querySelectorAll('.day-card').forEach(card=>{
-  const ts=[...card.querySelectorAll('.task')];
-  if(ts.length > 0){
-    const d=ts.filter(x=>x.checked).length; done+=d;
-    const progressText = card.querySelector('.progress-text');
-    if(progressText) progressText.textContent=`${d} / ${ts.length} 완료`;
-    const bar = card.querySelector('.bar');
-    if(bar) bar.style.width=`${ts.length?d/ts.length*100:0}%`;
-    ts.forEach(x=>x.closest('tr').classList.toggle('done',x.checked));
-  }
- });
- document.getElementById('total').textContent=`전체 ${done} / ${tasks.length}`;
- document.getElementById('percent').textContent=`진행률 ${tasks.length?Math.round(done/tasks.length*100):0}%`;
+
+function bindEvents(){
+  document.querySelectorAll('input').forEach(el => {
+    el.removeEventListener('input', save);
+    el.removeEventListener('change', save);
+    el.addEventListener('input', save);
+    el.addEventListener('change', save);
+  });
+  document.querySelectorAll('textarea.editable').forEach(el => {
+    el.removeEventListener('input', save);
+    el.addEventListener('input', () => {
+      autoResizeTextarea(el);
+      save();
+    });
+  });
 }
 
-tasks.forEach(x=>x.addEventListener('change',save));
-edits.forEach(x=>{
-  x.addEventListener('input', () => {
-    autoResizeTextarea(x);
-    save();
-  });
-});
+function update(){
+ let done = 0;
+ document.querySelectorAll('.day-card').forEach(card => {
+  const ts = [...card.querySelectorAll('.task')];
+  if(ts.length > 0){
+    const d = ts.filter(x => x.checked).length; done += d;
+    const progressText = card.querySelector('.progress-text');
+    if(progressText) progressText.textContent = `${d} / ${ts.length} 완료`;
+    const bar = card.querySelector('.bar');
+    if(bar) bar.style.width = `${ts.length ? d / ts.length * 100 : 0}%`;
+    ts.forEach(x => x.closest('tr').classList.toggle('done', x.checked));
+  }
+ });
+ const tasks = document.querySelectorAll('.task');
+ document.getElementById('total').textContent = `전체 ${done} / ${tasks.length}`;
+ document.getElementById('percent').textContent = `진행률 ${tasks.length ? Math.round(done / tasks.length * 100) : 0}%`;
+}
 
-document.querySelectorAll('.reset-day').forEach(btn=>btn.addEventListener('click',()=>{
- const card=btn.closest('.day-card');
- card.querySelectorAll('.task').forEach(x=>x.checked=false);
+document.querySelectorAll('.reset-day').forEach(btn => btn.addEventListener('click', () => {
+ const card = btn.closest('.day-card');
+ card.querySelectorAll('.task').forEach(x => x.checked = false);
  save();
 }));
-function checkAll(){tasks.forEach(x=>x.checked=true);save();}
-function clearAll(){tasks.forEach(x=>x.checked=false);save();}
 
-document.querySelectorAll('.add-row').forEach(btn=>{
- btn.addEventListener('click',()=>{
-   const card=btn.closest('.day-card');
-   const tbody=card.querySelector('tbody');
+function checkAll(){ document.querySelectorAll('input[type="checkbox"]').forEach(x => x.checked = true); save(); }
+function clearAll(){ document.querySelectorAll('input[type="checkbox"]').forEach(x => x.checked = false); save(); }
 
-   const tr=document.createElement('tr');
-   tr.innerHTML=`
+document.querySelectorAll('.add-row').forEach(btn => {
+ btn.addEventListener('click', () => {
+   const card = btn.closest('.day-card');
+   const tbody = card.querySelector('tbody');
+
+   const tr = document.createElement('tr');
+   tr.innerHTML = `
    <td class="check"><label><input type="checkbox" class="task"><span class="box"></span></label></td>
    <td class="time"><textarea class="editable time-edit"></textarea></td>
    <td class="content"><textarea class="editable content-edit"></textarea></td>`;
 
    tbody.appendChild(tr);
-
-   tr.querySelector('.task').addEventListener('change',save);
-   tr.querySelectorAll('.editable').forEach(x=>{
-     x.addEventListener('input', () => {
-       autoResizeTextarea(x);
-       save();
-     });
-   });
-
+   bindEvents();
    update();
  });
 });
@@ -436,33 +480,37 @@ function showPage(p){
     const btn = document.getElementById('btn-' + page);
     if(btn) btn.className = (p === page) ? 'action nav-btn' : 'action secondary nav-btn';
   });
-  // 탭 전환 시 높이 재계산
   setTimeout(adjustAllTextareas, 0);
 }
 
 function addSimpleRow(id){
-const tbody=document.getElementById(id).querySelector('tbody');
-const r=tbody.insertRow();
-r.innerHTML='<td><input type="text" value=""></td><td class="check"><label><input type="checkbox"><span class="box"></span></label></td>';
+  const tbody = document.getElementById(id).querySelector('tbody');
+  const r = tbody.insertRow();
+  r.innerHTML = '<td><input type="text" value=""></td><td class="check"><label><input type="checkbox"><span class="box"></span></label></td>';
+  bindEvents();
+  save();
 }
 
 function addPlaceRow(id){
-const tbody=document.getElementById(id).querySelector('tbody');
-const r=tbody.insertRow();
-r.innerHTML='<td><input type="text" placeholder="위치"></td><td><input type="text" placeholder="가게명"></td><td><input type="text" placeholder="내용"></td><td class="check"><label><input type="checkbox"><span class="box"></span></label></td>';
+  const tbody = document.getElementById(id).querySelector('tbody');
+  const r = tbody.insertRow();
+  r.innerHTML = '<td><input type="text" placeholder="위치"></td><td><input type="text" placeholder="가게명"></td><td><input type="text" placeholder="내용"></td><td class="check"><label><input type="checkbox"><span class="box"></span></label></td>';
+  bindEvents();
+  save();
 }
 
 function removeSimpleRow(id){
-const tbody=document.getElementById(id).querySelector('tbody');
-if(tbody.rows.length > 0) {
-  tbody.deleteRow(tbody.rows.length - 1);
-}
+  const tbody = document.getElementById(id).querySelector('tbody');
+  if(tbody.rows.length > 0) {
+    tbody.deleteRow(tbody.rows.length - 1);
+    save();
+  }
 }
 
-document.querySelectorAll('.remove-row').forEach(btn=>btn.addEventListener('click',()=>{
-const tb=btn.closest('.day-card').querySelector('tbody');
-if(tb.rows.length>1) tb.deleteRow(tb.rows.length-1);
-update();
+document.querySelectorAll('.remove-row').forEach(btn => btn.addEventListener('click', () => {
+  const tb = btn.closest('.day-card').querySelector('tbody');
+  if(tb.rows.length > 1) tb.deleteRow(tb.rows.length - 1);
+  save();
 }));
 
 window.addEventListener('resize', adjustAllTextareas);
