@@ -23,7 +23,7 @@ td{padding:8px 9px;border-bottom:1px solid #eef0f2;vertical-align:middle;font-si
 tr:last-child td{border-bottom:0}
 .check{width:45px;text-align:center;vertical-align:middle} .time{width:120px}
 
-/* 체크박스 스타일 수정 (기본 체크박스 완전히 숨김) */
+/* 체크박스 스타일 (기본 체크박스 완전히 숨김) */
 .check label{display:inline-block;position:relative;width:21px;height:21px;cursor:pointer;vertical-align:middle;}
 .check input[type="checkbox"]{position:absolute;opacity:0;width:0;height:0;margin:0;padding:0;pointer-events:none;}
 .box{display:block;width:21px;height:21px;border:2px solid #c7cbd1;border-radius:6px;cursor:pointer;position:relative;}
@@ -31,11 +31,12 @@ tr:last-child td{border-bottom:0}
 .check input[type="checkbox"]:checked + .box:after{content:"✓";color:white;position:absolute;left:3px;top:-2px;font-weight:800;font-size:13px;}
 
 tr.done .editable{color:#a3a7ad;text-decoration:line-through}
-.editable{display:block;width:100%;min-height:42px;border:1px solid transparent;border-radius:7px;padding:7px;background:transparent;color:#202124;font:inherit;font-size:14px;line-height:1.5;resize:vertical}
+
+/* 텍스트 입력창 높이 자동 조절 스타일 보완 */
+.editable{display:block;width:100%;height:auto;border:1px solid transparent;border-radius:7px;padding:7px;background:transparent;color:#202124;font:inherit;font-size:14px;line-height:1.5;resize:none;overflow:hidden;}
 .editable:hover{border-color:#e0e2e5;background:#fafafa}
 .editable:focus{outline:2px solid #dfe2e6;border-color:#aaa;background:#fff}
-.time-edit{font-weight:700;white-space:nowrap;resize:none;overflow:hidden}
-.content-edit{min-height:58px}
+.time-edit{font-weight:700;white-space:nowrap;}
 .guide-note{font-size:11px;color:#858b94;margin:4px 7px 0}
 button{border:0;border-radius:99px;padding:7px 10px;background:#f0f1f3;color:#555;font-size:12px;cursor:pointer}
 .actions{display:flex;justify-content:center;gap:8px;margin-top:18px;flex-wrap:wrap;}
@@ -339,6 +340,18 @@ button{border:0;border-radius:99px;padding:7px 10px;background:#f0f1f3;color:#55
 const tasks=[...document.querySelectorAll('.task')];
 const edits=[...document.querySelectorAll('.editable')];
 
+// 텍스트 영역 자동 높이 조절 기능
+function autoResizeTextarea(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+function adjustAllTextareas() {
+  document.querySelectorAll('textarea.editable').forEach(textarea => {
+    autoResizeTextarea(textarea);
+  });
+}
+
 function save(){
  localStorage.setItem('tokyo-checks',JSON.stringify(tasks.map(x=>x.checked)));
  const values={};
@@ -354,6 +367,7 @@ function load(){
   edits.forEach(x=>{if(Object.prototype.hasOwnProperty.call(values,x.dataset.key))x.value=values[x.dataset.key];});
  }catch(e){}
  update();
+ adjustAllTextareas();
 }
 function update(){
  let done=0;
@@ -371,8 +385,15 @@ function update(){
  document.getElementById('total').textContent=`전체 ${done} / ${tasks.length}`;
  document.getElementById('percent').textContent=`진행률 ${tasks.length?Math.round(done/tasks.length*100):0}%`;
 }
+
 tasks.forEach(x=>x.addEventListener('change',save));
-edits.forEach(x=>x.addEventListener('input',save));
+edits.forEach(x=>{
+  x.addEventListener('input', () => {
+    autoResizeTextarea(x);
+    save();
+  });
+});
+
 document.querySelectorAll('.reset-day').forEach(btn=>btn.addEventListener('click',()=>{
  const card=btn.closest('.day-card');
  card.querySelectorAll('.task').forEach(x=>x.checked=false);
@@ -395,7 +416,12 @@ document.querySelectorAll('.add-row').forEach(btn=>{
    tbody.appendChild(tr);
 
    tr.querySelector('.task').addEventListener('change',save);
-   tr.querySelectorAll('.editable').forEach(x=>x.addEventListener('input',save));
+   tr.querySelectorAll('.editable').forEach(x=>{
+     x.addEventListener('input', () => {
+       autoResizeTextarea(x);
+       save();
+     });
+   });
 
    update();
  });
@@ -410,6 +436,8 @@ function showPage(p){
     const btn = document.getElementById('btn-' + page);
     if(btn) btn.className = (p === page) ? 'action nav-btn' : 'action secondary nav-btn';
   });
+  // 탭 전환 시 높이 재계산
+  setTimeout(adjustAllTextareas, 0);
 }
 
 function addSimpleRow(id){
@@ -437,6 +465,7 @@ if(tb.rows.length>1) tb.deleteRow(tb.rows.length-1);
 update();
 }));
 
+window.addEventListener('resize', adjustAllTextareas);
 load();
 </script>
 </body>
